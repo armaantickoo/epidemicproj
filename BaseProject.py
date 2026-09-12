@@ -31,7 +31,7 @@ avgrlday = 1
 
 
 
-#strategy 0 is designated, 1 is rotate, 2 is random, 3 is adaptive
+#strategy 0 is designated, 1 is rotate, 2 is random, 3 is adaptive, 4 is adaptive smart
 def get_shopper(hh, day, strategy, adaptive_shopper):
     members = households[hh]
     
@@ -41,8 +41,13 @@ def get_shopper(hh, day, strategy, adaptive_shopper):
         shopper = members[day % len(members)]
     elif strategy == 2:
         shopper = np.random.choice(members)
-    else:
+    elif strategy == 3:
        
+        if adaptive_shopper[hh] != None:
+            shopper = adaptive_shopper[hh]
+        else:
+            shopper = members[day % len(members)]
+    else:
         if adaptive_shopper[hh] != None:
             shopper = adaptive_shopper[hh]
         else:
@@ -113,10 +118,11 @@ def one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_tim
         elif state[i] == 2 and np.random.random() < gamma:
             new_state[i] = 3
             recovered_time[i] = day
+            if strategy == 3 and adaptive_shopper[house[i]] == None:
+                adaptive_shopper[house[i]] = i
+            if strategy == 4:
+                adaptive_shopper[house[i]] = i
         elif state[i] == 3: # and np.random.random() < 1/avgrlday:
-            if strategy == 3:
-                if adaptive_shopper[house[i]] == None:
-                    adaptive_shopper[house[i]] = i
             days_since_rec = day-recovered_time[i]
             if days_since_rec >= grace:
                 if np.random.random() < omega:
@@ -185,20 +191,38 @@ def sim(strategy, tot_day):
     wave_ct.append(len(ever_infected) - last_tot)
     
     return wave_ct, len(ever_infected), n
+total = 0
+totalll = 0
+totallll = 0
+perc = 0
+perc2 = 0
+perc3 = 0
+#s, f, p = sim(0, tot_day)
+#total = f/p
+#print("designated tot:", total)
+#print("inf per wave:", s)
 
+#q, w, l = sim(3, tot_day)
+#totalll= w/l
+#print("adaptive tot:", totalll)
 
-s, f, p = sim(0, tot_day)
-total = f/p
-print("designated tot:", total)
-print("inf per wave:", s)
+#print("inf per wave:", q)
+for i in range(1000):
+    
+    s, f, p = sim(0, tot_day)
+    total = f/p
+    perc = (total/1000)+perc
 
-q, w, l = sim(3, tot_day)
-totalll= w/l
-print("adaptive tot:", totalll)
+    q, w, l = sim(3, tot_day)
+    totalll= w/l
+    perc2 = (totalll/1000)+perc2
+    x, y, z = sim(4, tot_day)
+    totallll= y/z
+    perc3 = (totallll/1000)+perc3
 
-print("inf per wave:", q)
-
-
+print("designated tot:", perc)
+print("adaptive tot:", perc2)
+print("adaptive smart tot:", perc3)
 
 #trials = 1000
 #beta_values = np.arange(0.1, 1.1, 0.1)  
