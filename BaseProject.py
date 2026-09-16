@@ -23,7 +23,12 @@ avgrlday = 1
 
 #adding the number of people in each house to validate that the sorting was done correctly(also can be used later to see how different household populations effect the mdoel)
 
-
+#creating age distinctions - varying susceptibility based on age grp
+age_bands = ['child', 'adult', 'senior']
+age_band_probs = [0.22, 0.60, 0.18]
+susceptibility_by_age = {'child': 0.5, 'adult': 1.0, 'senior': 1.5}
+gamma_mult_by_age = {'child': 1.2, 'adult': 1.0, 'senior': 0.7}
+omega_mult_by_age = {'child': 0.7, 'adult': 1.0, 'senior': 2.5}
 
 #manually creating an array of those visiting the house
 #print(household_pop)
@@ -74,7 +79,8 @@ def store_contact(state, new_state, day, strategy, ever_infected, adaptive_shopp
             elif state[chosen] == 0:
                 Sshopper_list.append(chosen)
         for s in Sshopper_list:
-            if np.random.random() < 1-(1-beta_store)**infected_count:
+            #if np.random.random() < 1-(1-beta_store)**infected_count:
+            if np.random.random() < 1-(1-beta_store*susceptibility[s])**infected_count:
                 new_state[s] = 1
                 ever_infected.add(s)
                 
@@ -103,7 +109,8 @@ def household_contact(state, new_state, ever_infected):
             elif state[m] == 0:
                 inh_s_p.append(m)
         for u in inh_s_p:
-            if np.random.random() < 1 - (1-beta_house)**inh_infected:
+            #if np.random.random() < 1 - (1-beta_house)**inh_infected:
+            if np.random.random() < 1 - (1-beta_house*susceptibility[u])**inh_infected:
                 new_state[u] = 1
                 ever_infected.add(u)
     return new_state
@@ -115,7 +122,8 @@ def one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_tim
     for i in range(n):
         if state[i] == 1 and np.random.random() < sigma:
             new_state[i] = 2
-        elif state[i] == 2 and np.random.random() < gamma:
+        elif state[i] == 2 and np.random.random() < gamma_i[i]:
+        #elif state[i] == 2 and np.random.random() < gamma:
             new_state[i] = 3
             recovered_time[i] = day
             if strategy == 3 and adaptive_shopper[house[i]] == None:
@@ -132,7 +140,7 @@ def one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_tim
  
 
 def sim(strategy, tot_day):
-    global house, households, household_pop, n 
+    global house, households, household_pop, n, susceptibility, gamma_i, omega_i
     household_size = np.random.choice(
     [1,2,3,4,5,6,7],
     size=n_households,
@@ -141,6 +149,11 @@ def sim(strategy, tot_day):
 
 
     n = np.sum(household_size)
+
+    age_band = np.random.choice(age_bands, size=n, p=age_band_probs)
+    susceptibility = np.array([susceptibility_by_age[a] for a in age_band])
+    gamma_i = np.array([gamma * gamma_mult_by_age[a] for a in age_band])
+    omega_i = np.array([omega * omega_mult_by_age[a] for a in age_band])
 
 
     #create a dictionary that will return what house a person is in given there ID(number)
