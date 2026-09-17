@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 import numpy as np
-from sympy import N
+
 
 
 
@@ -13,8 +13,8 @@ grace = 210
 omega = 0.0014
 gamma = 1/10        #recovery rate
 sigma = 1/4         #incubation period 
-beta_house = 0.08 #calibrated to give 2.2 R0_household
-beta_store = 0.03 #infectivity in store based off of R0 of 2.8ish
+beta_house = 0.08
+beta_store = 0.03   #MUST be recalibrated every time population size changes
 n_households = 20   #number of houses
 #household_size = 4  #number of ppl per house
 

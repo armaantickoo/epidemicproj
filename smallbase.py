@@ -7,8 +7,8 @@ import numpy as np
 #Parameter definitions
 gamma = 1/10        #recovery rate
 sigma = 1/4        #incubation period
-beta_house = 0.2 #calibrated to give 2.2 as R0_household
-beta_store = 0.2  #infectivity in store based off of R0 of 2.8ish
+beta_house = 0.2 
+beta_store = 0.2   # the beta values are higher because the population is smaller, they change for validation
 n_households = 2   #number of houses
 household_size = 1  #number of ppl per house
 n = n_households * household_size
