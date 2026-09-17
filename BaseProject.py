@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 import numpy as np
-from sympy import N
+
 
 
 
@@ -13,8 +13,8 @@ grace = 210
 omega = 0.0014
 gamma = 1/10        #recovery rate
 sigma = 1/4         #incubation period 
-beta_house = 0.08 #calibrated to give 2.2 R0_household
-beta_store = 0.03 #infectivity in store based off of R0 of 2.8ish
+beta_house = 0.08
+beta_store = 0.03   #MUST be recalibrated every time population size changes
 n_households = 20   #number of houses
 #household_size = 4  #number of ppl per house
 
@@ -205,11 +205,15 @@ def sim(strategy, tot_day):
     
     return wave_ct, len(ever_infected), n
 total = 0
+totall = 0
 totalll = 0
 totallll = 0
+totalllll = 0
 perc = 0
+perc1 = 0
 perc2 = 0
 perc3 = 0
+perc4 = 0
 #s, f, p = sim(0, tot_day)
 #total = f/p
 #print("designated tot:", total)
@@ -218,22 +222,33 @@ perc3 = 0
 #q, w, l = sim(3, tot_day)
 #totalll= w/l
 #print("adaptive tot:", totalll)
-
+trials=50
 #print("inf per wave:", q)
-for i in range(1000):
+for i in range(trials):
     
     s, f, p = sim(0, tot_day)
     total = f/p
-    perc = (total/1000)+perc
+    perc = (total/trials)+perc
+
+    sa, fp, pf = sim(1, tot_day)
+    totall = fp/pf
+    perc1 = (totall/trials)+perc1
+
+    sr, fr, pr = sim(2, tot_day)
+    totalllll = fr/pr
+    perc4 = (totalllll/trials)+perc4
 
     q, w, l = sim(3, tot_day)
     totalll= w/l
-    perc2 = (totalll/1000)+perc2
+    perc2 = (totalll/trials)+perc2
+
     x, y, z = sim(4, tot_day)
     totallll= y/z
-    perc3 = (totallll/1000)+perc3
+    perc3 = (totallll/trials)+perc3
 
 print("designated tot:", perc)
+print("rotation tot:", perc1)
+print("random tot:", perc4)
 print("adaptive tot:", perc2)
 print("adaptive smart tot:", perc3)
 
