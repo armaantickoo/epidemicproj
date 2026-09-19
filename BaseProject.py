@@ -7,14 +7,14 @@ import numpy as np
 
 
 #Parameter definitions
-re_int = 200
+re_int = 100
 tot_day = 2000
 grace = 210
 omega = 0.0014
 gamma = 1/10        #recovery rate
 sigma = 1/4         #incubation period 
-beta_house = 0.08
-beta_store = 0.03   #MUST be recalibrated every time population size changes
+beta_house = 0.0215 #callibrated for SAR of about 18percent
+beta_store = 0.02   #MUST be recalibrated every time population size changes, callibrated for casual attack rates across research
 n_households = 20   #number of houses
 #household_size = 4  #number of ppl per house
 
