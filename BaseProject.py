@@ -176,6 +176,11 @@ def sim(strategy, tot_day):
 
     state[initial_infected] = 1
     ever_infected = {initial_infected}
+
+    total_infections = 1  
+    peak_infectious = 0
+    peak_day = 0
+
     adaptive_shopper = {}
     for i in range(n_households):
         adaptive_shopper[i] = None
@@ -183,74 +188,176 @@ def sim(strategy, tot_day):
     peak = 0
     wave_ct = []
     last_tot = 0
+
     for i in range(tot_day):
-        infected_mask = state == 2
-        infected_pop = state[infected_mask]
-        susceptible_mask = state == 0
-        susceptible_pop = np.where(susceptible_mask)[0]
-        
-        if len(infected_pop) > peak:
-            peak = len(infected_pop)
+        state_before_day = state.copy()
+
+        # Periodically reseed the epidemic
         if day % re_int == 0 and day > 0:
+            susceptible_pop = np.where(state == 0)[0]
+
             if len(susceptible_pop) > 0:
                 wave_ct.append(len(ever_infected) - last_tot)
                 last_tot = len(ever_infected)
+
                 new_inf = np.random.choice(susceptible_pop)
                 state[new_inf] = 1
                 ever_infected.add(new_inf)
-    
-        state = one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_time)
-        day = day + 1
+
+        state = one_day(
+            state, day, strategy, ever_infected,
+            adaptive_shopper, recovered_time
+        )
+
+        new_infections_today = np.sum(
+            (state_before_day == 0) & (state == 1)
+        )
+        total_infections += new_infections_today
+
+        current_infectious = np.sum(state == 2)
+
+        if current_infectious > peak_infectious:
+            peak_infectious = current_infectious
+            peak_day = day
+
+        day += 1
+
     wave_ct.append(len(ever_infected) - last_tot)
+
+    return (
+        wave_ct,
+        len(ever_infected),
+        n,
+        total_infections,
+        peak_day,
+        peak_infectious
+    )
+
+    strategies = {
+    0: "designated",
+    1: "rotation",
+    2: "random",
+    3: "adaptive",
+    4: "adaptive smart"
+}
+
+trials = 50
+
+results = {
+    strategy: {
+        "unique_infected_pct": [],
+        "total_infections": [],
+        "peak_day": [],
+        "peak_infectious": []
+    }
+    for strategy in strategies
+}
+
+for trial in range(trials):
+    for strategy in strategies:
+        wave_ct, unique_infected, population, total_inf, peak_day, peak_inf = (
+            sim(strategy, tot_day)
+        )
+
+        results[strategy]["unique_infected_pct"].append(
+            100 * unique_infected / population
+        )
+        results[strategy]["total_infections"].append(total_inf)
+        results[strategy]["peak_day"].append(peak_day)
+        results[strategy]["peak_infectious"].append(peak_inf)
+
+for strategy, name in strategies.items():
+    print(f"\n{name.upper()}")
+
+    print(
+        "Average % ever infected:",
+        round(np.mean(results[strategy]["unique_infected_pct"]), 2)
+    )
+
+    print(
+        "Average total infection episodes:",
+        round(np.mean(results[strategy]["total_infections"]), 2)
+    )
+
+    print(
+        "Average peak day:",
+        round(np.mean(results[strategy]["peak_day"]), 2)
+    )
+
+    print(
+        "Average peak infectious population:",
+        round(np.mean(results[strategy]["peak_infectious"]), 2)
+    )
+
+
+    # for i in range(tot_day):
+    #     infected_mask = state == 2
+    #     infected_pop = state[infected_mask]
+    #     susceptible_mask = state == 0
+    #     susceptible_pop = np.where(susceptible_mask)[0]
+        
+    #     if len(infected_pop) > peak:
+    #         peak = len(infected_pop)
+    #     if day % re_int == 0 and day > 0:
+    #         if len(susceptible_pop) > 0:
+    #             wave_ct.append(len(ever_infected) - last_tot)
+    #             last_tot = len(ever_infected)
+    #             new_inf = np.random.choice(susceptible_pop)
+    #             state[new_inf] = 1
+    #             ever_infected.add(new_inf)
     
-    return wave_ct, len(ever_infected), n
-total = 0
-totall = 0
-totalll = 0
-totallll = 0
-totalllll = 0
-perc = 0
-perc1 = 0
-perc2 = 0
-perc3 = 0
-perc4 = 0
-#s, f, p = sim(0, tot_day)
-#total = f/p
-#print("designated tot:", total)
-#print("inf per wave:", s)
-
-#q, w, l = sim(3, tot_day)
-#totalll= w/l
-#print("adaptive tot:", totalll)
-trials=50
-#print("inf per wave:", q)
-for i in range(trials):
+    #     state = one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_time)
+    #     day = day + 1
+    # wave_ct.append(len(ever_infected) - last_tot)
     
-    s, f, p = sim(0, tot_day)
-    total = f/p
-    perc = (total/trials)+perc
+    # return wave_ct, len(ever_infected), n
+# total = 0
+# totall = 0
+# totalll = 0
+# totallll = 0
+# totalllll = 0
+# perc = 0
+# perc1 = 0
+# perc2 = 0
+# perc3 = 0
+# perc4 = 0
+# #s, f, p = sim(0, tot_day)
+# #total = f/p
+# #print("designated tot:", total)
+# #print("inf per wave:", s)
 
-    sa, fp, pf = sim(1, tot_day)
-    totall = fp/pf
-    perc1 = (totall/trials)+perc1
+# #q, w, l = sim(3, tot_day)
+# #totalll= w/l
+# #print("adaptive tot:", totalll)
+# trials=50
+# #print("inf per wave:", q)
+# for i in range(trials):
+    
+#     s, f, p = sim(0, tot_day)
+#     total = f/p
+#     perc = (total/trials)+perc
 
-    sr, fr, pr = sim(2, tot_day)
-    totalllll = fr/pr
-    perc4 = (totalllll/trials)+perc4
+#     sa, fp, pf = sim(1, tot_day)
+#     totall = fp/pf
+#     perc1 = (totall/trials)+perc1
 
-    q, w, l = sim(3, tot_day)
-    totalll= w/l
-    perc2 = (totalll/trials)+perc2
+#     sr, fr, pr = sim(2, tot_day)
+#     totalllll = fr/pr
+#     perc4 = (totalllll/trials)+perc4
 
-    x, y, z = sim(4, tot_day)
-    totallll= y/z
-    perc3 = (totallll/trials)+perc3
+#     q, w, l = sim(3, tot_day)
+#     totalll= w/l
+#     perc2 = (totalll/trials)+perc2
 
-print("designated tot:", perc)
-print("rotation tot:", perc1)
-print("random tot:", perc4)
-print("adaptive tot:", perc2)
-print("adaptive smart tot:", perc3)
+#     x, y, z = sim(4, tot_day)
+#     totallll= y/z
+#     perc3 = (totallll/trials)+perc3
+
+# print("designated tot:", perc)
+# print("rotation tot:", perc1)
+# print("random tot:", perc4)
+# print("adaptive tot:", perc2)
+# print("adaptive smart tot:", perc3)
 
 #trials = 1000
 #beta_values = np.arange(0.1, 1.1, 0.1)  
