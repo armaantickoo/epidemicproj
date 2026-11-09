@@ -1,4 +1,4 @@
-Formula for the reproductive number in the household $R_{0,\text{house}}$
+$\text{\large{Formula for the reproductive number in the household}}$
 
 $$
 R_{0,\text{house}} =
@@ -34,8 +34,21 @@ $$
 
 which plugging into $E_h(1-p_{esc})$ gives us our original formula for $R_{0,\text{house}}$
 
+$\text{\large{Partial Derivatives}}$
 
+The partial derivative of $R_{0,\text{house}}$ with respect to $\beta_h$ is 
 
+$$
+\frac{\partial R_{0,\text{house}}}{\partial \beta_h} =
+E_h(\frac{\gamma}{(1-(1-\beta_h)(1-\gamma))^2}
+$$
+
+and the partial derivative of $R_{0,\text{house}}$ with respect to $\gamma$ is
+
+$$
+\frac{\partial R_{0,\text{house}}}{\partial \gamma} =
+-E_h(\frac{\beta_h(1-\beta_h)}{(1-(1-\beta_h)(1-\gamma))^2}
+$$
 
 
 
