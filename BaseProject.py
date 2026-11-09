@@ -21,6 +21,10 @@ n_households = 20   #number of houses
 store_int = 3       #store visit every 3 days
 avgrlday = 1    
 
+
+SEED = 17
+np.random.seed(SEED)
+POP_SEED = 42
 #adding the number of people in each house to validate that the sorting was done correctly(also can be used later to see how different household populations effect the mdoel)
 
 #creating age distinctions - varying susceptibility based on age grp
@@ -141,16 +145,20 @@ def one_day(state, day, strategy, ever_infected, adaptive_shopper, recovered_tim
 
 def sim(strategy, tot_day):
     global house, households, household_pop, n, susceptibility, gamma_i, omega_i
+
+    saved_state = np.random.get_state()
+    np.random.seed(POP_SEED)
+
     household_size = np.random.choice(
-    [1,2,3,4,5,6,7],
-    size=n_households,
-    p=[0.29,0.35,0.16,0.13,0.04,0.02,0.01]
-)
-
-
+        [1,2,3,4,5,6,7],
+        size=n_households,
+        p=[0.29,0.35,0.16,0.13,0.04,0.02,0.01]
+    )
     n = np.sum(household_size)
-
     age_band = np.random.choice(age_bands, size=n, p=age_band_probs)
+
+    np.random.set_state(saved_state)
+
     susceptibility = np.array([susceptibility_by_age[a] for a in age_band])
     gamma_i = np.array([gamma * gamma_mult_by_age[a] for a in age_band])
     omega_i = np.array([omega * omega_mult_by_age[a] for a in age_band])
@@ -233,7 +241,7 @@ def sim(strategy, tot_day):
         peak_infectious
     )
 
-    strategies = {
+strategies = {
     0: "designated",
     1: "rotation",
     2: "random",
@@ -241,7 +249,7 @@ def sim(strategy, tot_day):
     4: "adaptive smart"
 }
 
-trials = 50
+trials = 5000
 
 results = {
     strategy: {
@@ -271,24 +279,27 @@ for strategy, name in strategies.items():
 
     print(
         "Average % ever infected:",
-        round(np.mean(results[strategy]["unique_infected_pct"]), 2)
+        round(np.mean(results[strategy]["unique_infected_pct"]), 2),
+        "+/-", round(np.std(results[strategy]["unique_infected_pct"], ddof=1), 2)
     )
 
     print(
         "Average total infection episodes:",
-        round(np.mean(results[strategy]["total_infections"]), 2)
+        round(np.mean(results[strategy]["total_infections"]), 2),
+        "+/-", round(np.std(results[strategy]["total_infections"], ddof=1), 2)
     )
 
     print(
         "Average peak day:",
-        round(np.mean(results[strategy]["peak_day"]), 2)
+        round(np.mean(results[strategy]["peak_day"]), 2),
+        "+/-", round(np.std(results[strategy]["peak_day"], ddof=1), 2)
     )
 
     print(
         "Average peak infectious population:",
-        round(np.mean(results[strategy]["peak_infectious"]), 2)
+        round(np.mean(results[strategy]["peak_infectious"]), 2),
+        "+/-", round(np.std(results[strategy]["peak_infectious"], ddof=1), 2)
     )
-
 
     # for i in range(tot_day):
     #     infected_mask = state == 2
