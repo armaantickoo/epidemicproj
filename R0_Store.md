@@ -69,3 +69,37 @@ E_s
 \frac{\beta_s}
 {1-(1-\gamma)^3(1-\beta_s)}
 $$
+
+$\text{\large{Partial Derivatives}}$
+
+The partial derivative with respect to $\beta_s$ is 
+
+$$
+\frac{\partial R_{0, \text{store}}}{\partial \beta_s} =
+E_s
+\times
+\frac{\sigma(1-\gamma)^2+\sigma(1=\sigma)(1-\gamma)+\sigma(1-\sigma)^2}{1-(1-\sigma)^3}
+\times
+\frac{1-(1-\gamma)^3}{(1-(1-\gamma)^3(1-\beta_s))^2}
+$$
+
+The partial derivative with respect to $\gamma$ is 
+
+$$
+\frac{\partial R_{0, \text{store}}}{\partial \beta_s} =
+E_s
+\times
+\left(
+\frac{\sigma(1-\gamma)^2+\sigma(1-\sigma)(1-\gamma)+\sigma(1-\sigma)^2}
+{1-(1-\sigma)^3}
+\times
+\frac{-3\beta_s(1-\gamma)^2(1-\beta_s)}
+{(1-(1-\gamma)^3(1-\beta_2))^2}
++
+\frac{-2\sigma(1-\gamma)-\sigma(1-\sigma)}
+{1-(1-\sigma)^3}
+\times
+\frac{\beta_s}
+{1-(1-\gamma)^3(1-\beta_s)}
+\right)
+$$
