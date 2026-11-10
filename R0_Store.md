@@ -43,10 +43,10 @@ $$
 
 which is the same as A. 
 
-Now, to derive B, we first recognize B is nothing but the probability someone gets infected given an infectious shopper. We can derive this by realizing that the chance of an infection on the first shopping day with an infectious shopper is simply $/beta_s$, and the chance of infection on the next day is $\beta_s(1-\gamma)^3(1-\beta_s)$. this gives us the geometric series
+Now, to derive B, we first recognize B is nothing but the probability someone gets infected given an infectious shopper. We can derive this by realizing that the chance of an infection on the first shopping day with an infectious shopper is simply $\beta_s$, and the chance of infection on the next day is $\beta_s(1-\gamma)^3(1-\beta_s)$. this gives us the geometric series
 
 $$
-\sum_{i=0}^{infty} \beta_s(1-\gamma)^{3i}(1-\beta_s)^i
+\sum_{i=0}^{\infty} \beta_s(1-\gamma)^{3i}(1-\beta_s)^i
 $$
 
 and since $0<\beta_s,\gamma<1$, we can take this sum which is of the form
